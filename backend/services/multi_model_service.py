@@ -8,6 +8,10 @@ import json
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import warnings
+
+# Suppress scikit-learn version warnings
+warnings.filterwarnings('ignore', category=UserWarning, module='sklearn')
 
 class MultiModelService:
     """Service to manage multiple ML models"""

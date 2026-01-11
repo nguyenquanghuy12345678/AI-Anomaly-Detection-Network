@@ -103,11 +103,23 @@ class APIService {
     // ========================================
 
     async getNetworkTraffic(timeRange = '1h') {
-        return this.get(this.endpoints.networkTraffic, { timeRange });
+        return this.get(this.endpoints.traffic, { timeRange });
     }
 
     async getNetworkStats() {
-        return this.get(this.endpoints.networkStats);
+        return this.get(this.endpoints.trafficStats);
+    }
+    
+    async getConnections() {
+        return this.get(this.endpoints.connections);
+    }
+    
+    async getConnectionStats() {
+        return this.get(this.endpoints.connectionStats);
+    }
+    
+    async getTrafficStats() {
+        return this.get(this.endpoints.trafficStats);
     }
 
     // ========================================

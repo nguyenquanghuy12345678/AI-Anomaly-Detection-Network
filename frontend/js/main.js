@@ -3,6 +3,108 @@
 // ========================================
 
 // ========================================
+// WebSocket Connection
+// ========================================
+
+let wsConnected = false;
+let wsReconnectAttempts = 0;
+const wsMaxReconnectAttempts = 5;
+
+function connectWebSocket() {
+    try {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsHost = API_CONFIG.baseURL.replace(/^https?:\/\//, '');
+        const wsUrl = `${wsProtocol}//${wsHost}`;
+        
+        const socket = io(wsUrl, {
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: wsMaxReconnectAttempts,
+            reconnectionDelay: 1000
+        });
+
+        socket.on('connect', () => {
+            wsConnected = true;
+            wsReconnectAttempts = 0;
+            console.log('✅ WebSocket connected successfully');
+            showNotification('Real-time monitoring active', 'success');
+        });
+
+        // Listen for server connection confirmation
+        socket.on('connected', (data) => {
+            console.log('✅ Server confirmed:', data.message);
+        });
+
+        socket.on('disconnect', () => {
+            wsConnected = false;
+            console.log('❌ WebSocket disconnected');
+        });
+
+        socket.on('connect_error', (error) => {
+            wsReconnectAttempts++;
+            console.error('❌ WebSocket connection error:', error);
+            if (wsReconnectAttempts >= wsMaxReconnectAttempts) {
+                showNotification('Real-time updates unavailable', 'warning');
+            }
+        });
+
+        // Listen for anomaly detection events
+        socket.on('anomaly_detected', (data) => {
+            console.log('New anomaly detected:', data);
+            showNotification(`New ${data.severity} anomaly detected from ${data.source_ip}`, 'warning');
+            
+            // Refresh current page data
+            if (typeof dashboardManager !== 'undefined' && dashboardManager) {
+                dashboardManager.loadAnomaliesTable();
+                dashboardManager.updateMetrics();
+            }
+            if (typeof monitoringManager !== 'undefined' && monitoringManager) {
+                monitoringManager.loadConnections();
+            }
+            if (typeof alertsManager !== 'undefined' && alertsManager) {
+                alertsManager.loadAlerts();
+            }
+        });
+
+        // Listen for traffic update events
+        socket.on('traffic_update', (data) => {
+            console.log('Traffic update:', data);
+            
+            // Update traffic displays
+            if (typeof monitoringManager !== 'undefined' && monitoringManager) {
+                monitoringManager.loadTrafficStats();
+            }
+            if (typeof dashboardManager !== 'undefined' && dashboardManager) {
+                dashboardManager.updateMetrics();
+            }
+        });
+
+        // Listen for alert events
+        socket.on('alert_created', (data) => {
+            console.log('New alert created:', data);
+            showNotification(`New alert: ${data.message}`, data.severity === 'critical' ? 'error' : 'warning');
+            
+            // Refresh alerts page if active
+            if (typeof alertsManager !== 'undefined' && alertsManager) {
+                alertsManager.loadAlerts();
+            }
+        });
+
+        // Listen for model update events
+        socket.on('model_updated', (data) => {
+            console.log('Model updated:', data);
+            showNotification('AI model has been updated', 'info');
+        });
+
+        return socket;
+    } catch (error) {
+        console.error('Failed to initialize WebSocket:', error);
+        showNotification('Real-time updates unavailable', 'warning');
+        return null;
+    }
+}
+
+// ========================================
 // Utility Functions
 // ========================================
 
@@ -628,3 +730,15 @@ console.log('%c🛡️ AI Network Anomaly Detection System', 'color: #667eea; fo
 console.log('%cVersion 1.0.0', 'color: #764ba2; font-size: 14px;');
 console.log('%cInitializing security monitoring...', 'color: #43e97b; font-size: 12px;');
 console.log('%c💡 Press ? to see keyboard shortcuts', 'color: #feca57; font-size: 12px;');
+// ========================================
+// Application Initialization
+// ========================================
+
+// Initialize WebSocket connection on app load
+let appWebSocket = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Connect WebSocket for real-time updates
+    appWebSocket = connectWebSocket();
+    console.log('%c🔌 WebSocket connection initiated', 'color: #38ada9; font-size: 12px;');
+});

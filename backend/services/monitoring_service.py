@@ -6,6 +6,7 @@ import time
 import random
 from datetime import datetime
 import uuid
+from flask import current_app
 from services.websocket_service import emit_anomaly, emit_traffic_update, emit_alert
 from services.cache_service import cache
 
@@ -78,7 +79,7 @@ def generate_mock_anomaly():
     
     return anomaly
 
-def monitoring_loop(socketio):
+def monitoring_loop(socketio, app):
     """Main monitoring loop"""
     global monitoring_active
     
@@ -89,41 +90,42 @@ def monitoring_loop(socketio):
     
     while monitoring_active:
         try:
-            # Generate traffic data every 2 seconds
-            if traffic_counter % 2 == 0:
-                traffic = generate_mock_traffic_data()
-                emit_traffic_update(traffic.to_dict())
-            
-            # Generate anomaly data every 10-30 seconds randomly
-            if anomaly_counter >= random.randint(10, 30):
-                if random.random() > 0.3:  # 70% chance to generate anomaly
-                    anomaly = generate_mock_anomaly()
-                    emit_anomaly(anomaly.to_dict())
-                    
-                    # Create alert for high/critical anomalies
-                    if anomaly.severity in ['high', 'critical']:
-                        from models.alert import Alert
-                        from database import db
-                        
-                        alert = Alert(
-                            id=str(uuid.uuid4()),
-                            timestamp=datetime.utcnow(),
-                            severity=anomaly.severity,
-                            status='unread',
-                            type=anomaly.type,
-                            title=f"New {anomaly.severity} severity threat detected",
-                            description=anomaly.description,
-                            source_ip=anomaly.source_ip,
-                            affected_systems=1,
-                            requires_action=True,
-                            anomaly_id=anomaly.id
-                        )
-                        db.session.add(alert)
-                        db.session.commit()
-                        
-                        emit_alert(alert.to_dict())
+            with app.app_context():
+                # Generate traffic data every 2 seconds
+                if traffic_counter % 2 == 0:
+                    traffic = generate_mock_traffic_data()
+                    emit_traffic_update(traffic.to_dict())
                 
-                anomaly_counter = 0
+                # Generate anomaly data every 10-30 seconds randomly
+                if anomaly_counter >= random.randint(10, 30):
+                    if random.random() > 0.3:  # 70% chance to generate anomaly
+                        anomaly = generate_mock_anomaly()
+                        emit_anomaly(anomaly.to_dict())
+                        
+                        # Create alert for high/critical anomalies
+                        if anomaly.severity in ['high', 'critical']:
+                            from models.alert import Alert
+                            from database import db
+                            
+                            alert = Alert(
+                                id=str(uuid.uuid4()),
+                                timestamp=datetime.utcnow(),
+                                severity=anomaly.severity,
+                                status='unread',
+                                type=anomaly.type,
+                                title=f"New {anomaly.severity} severity threat detected",
+                                description=anomaly.description,
+                                source_ip=anomaly.source_ip,
+                                affected_systems=1,
+                                requires_action=True,
+                                anomaly_id=anomaly.id
+                            )
+                            db.session.add(alert)
+                            db.session.commit()
+                            
+                            emit_alert(alert.to_dict())
+                    
+                    anomaly_counter = 0
             
             traffic_counter += 1
             anomaly_counter += 1
@@ -134,7 +136,7 @@ def monitoring_loop(socketio):
             print(f"❌ Monitoring error: {e}")
             time.sleep(5)
 
-def start_monitoring(socketio):
+def start_monitoring(socketio, app):
     """Start background monitoring service"""
     global monitoring_active, monitoring_thread
     
@@ -143,7 +145,7 @@ def start_monitoring(socketio):
         return
     
     monitoring_active = True
-    monitoring_thread = threading.Thread(target=monitoring_loop, args=(socketio,), daemon=True)
+    monitoring_thread = threading.Thread(target=monitoring_loop, args=(socketio, app), daemon=True)
     monitoring_thread.start()
     
     print("✅ Monitoring service started")

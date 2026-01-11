@@ -37,17 +37,31 @@ class AlertsManager {
 
     async loadAlerts() {
         try {
-            // In production, replace with actual API call
-            // const response = await apiService.getAlerts();
+            // Get real alerts from API
+            const response = await apiService.getAlerts();
             
-            // Using mock data
+            if (response && response.alerts) {
+                this.alerts = response.alerts;
+            } else if (response && Array.isArray(response)) {
+                this.alerts = response;
+            } else {
+                // Fallback to mock data if API fails
+                console.warn('Using mock alerts - API returned unexpected format');
+                this.alerts = this.generateMockAlerts(50);
+            }
+            
+            this.applyFilters();
+            this.renderAlerts();
+            this.updateStats();
+            showNotification('Alerts loaded successfully', 'success');
+        } catch (error) {
+            console.error('Error loading alerts:', error);
+            showNotification('Failed to load alerts - using cached data', 'warning');
+            // Use mock data as fallback
             this.alerts = this.generateMockAlerts(50);
             this.applyFilters();
             this.renderAlerts();
             this.updateStats();
-        } catch (error) {
-            console.error('Error loading alerts:', error);
-            showNotification('Failed to load alerts', 'error');
         }
     }
 

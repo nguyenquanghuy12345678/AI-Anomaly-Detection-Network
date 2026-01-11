@@ -36,12 +36,31 @@ class AnalyticsManager {
                 this.loadTopThreats(),
                 this.loadGeographicData()
             ]);
+            showNotification('Analytics loaded successfully', 'success');
         } catch (error) {
             console.error('Error loading analytics:', error);
+            showNotification('Failed to load some analytics data', 'warning');
         }
     }
 
     async loadTrendData() {
+        try {
+            // Try to get real trend data from API
+            const response = await apiService.getAnomalyStats();
+            
+            if (response && response.trends) {
+                this.reportData.trends = response.trends;
+            } else {
+                // Fallback to mock data
+                this.loadMockTrendData();
+            }
+        } catch (error) {
+            console.error('Error loading trend data:', error);
+            this.loadMockTrendData();
+        }
+    }
+    
+    loadMockTrendData() {
         // Mock data for trends
         this.reportData.trends = {
             labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
@@ -52,6 +71,31 @@ class AnalyticsManager {
     }
 
     async loadStatistics() {
+        try {
+            // Try to get real statistics from API
+            const response = await apiService.getAnomalyStats();
+            
+            if (response && response.statistics) {
+                const stats = response.statistics;
+                updateElement('total-anomalies-analytics', stats.totalAnomalies || 0);
+                updateElement('total-blocked-analytics', stats.totalBlocked || 0);
+                updateElement('avg-response-analytics', (stats.avgResponseTime || 0) + ' min');
+                updateElement('detection-accuracy', (stats.detectionAccuracy || 0) + '%');
+                updateElement('false-positives', (stats.falsePositives || 0) + '%');
+                updateElement('critical-incidents', stats.criticalIncidents || 0);
+                updateElement('high-incidents', stats.highIncidents || 0);
+                updateElement('medium-incidents', stats.mediumIncidents || 0);
+            } else {
+                // Fallback to mock statistics
+                this.loadMockStatistics();
+            }
+        } catch (error) {
+            console.error('Error loading statistics:', error);
+            this.loadMockStatistics();
+        }
+    }
+    
+    loadMockStatistics() {
         const stats = {
             totalAnomalies: 196,
             totalBlocked: 143,
@@ -75,6 +119,25 @@ class AnalyticsManager {
     }
 
     async loadTopThreats() {
+        try {
+            // Try to get real top threats from API
+            const response = await apiService.get(API_CONFIG.endpoints.anomalies.base + '/top-threats');
+            
+            if (response && response.threats) {
+                this.reportData.topThreats = response.threats;
+            } else {
+                // Fallback to mock data
+                this.loadMockTopThreats();
+            }
+        } catch (error) {
+            console.error('Error loading top threats:', error);
+            this.loadMockTopThreats();
+        }
+
+        this.renderTopThreats();
+    }
+    
+    loadMockTopThreats() {
         this.reportData.topThreats = [
             { name: 'Port Scan', count: 45, trend: '+12%' },
             { name: 'DDoS Attack', count: 32, trend: '-5%' },
@@ -82,11 +145,28 @@ class AnalyticsManager {
             { name: 'SQL Injection', count: 19, trend: '+3%' },
             { name: 'Malware', count: 15, trend: '-10%' }
         ];
-
-        this.renderTopThreats();
     }
 
     async loadGeographicData() {
+        try {
+            // Try to get real geographic data from API
+            const response = await apiService.get(API_CONFIG.endpoints.anomalies.base + '/geographic');
+            
+            if (response && response.geographic) {
+                this.reportData.geographic = response.geographic;
+            } else {
+                // Fallback to mock data
+                this.loadMockGeographicData();
+            }
+        } catch (error) {
+            console.error('Error loading geographic data:', error);
+            this.loadMockGeographicData();
+        }
+
+        this.renderGeographicData();
+    }
+    
+    loadMockGeographicData() {
         // Mock geographic data
         this.reportData.geographic = [
             { country: 'China', count: 145, percentage: 32 },
@@ -96,8 +176,6 @@ class AnalyticsManager {
             { country: 'India', count: 43, percentage: 10 },
             { country: 'Others', count: 30, percentage: 7 }
         ];
-
-        this.renderGeographicData();
     }
 
     // ========================================

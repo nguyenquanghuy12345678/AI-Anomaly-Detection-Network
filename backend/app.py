@@ -64,9 +64,16 @@ def index():
 if __name__ == '__main__':
     port = int(os.getenv('API_PORT', 5000))
     
+    print("⚠️  WARNING: Using Flask development server!")
+    print("📌 For production, use: gunicorn --config gunicorn.conf.py wsgi:application")
+    print("")
+    
     # Start background monitoring service
-    start_monitoring(socketio)
+    start_monitoring(socketio, app)
     
     # Run the application
     print(f"🚀 Starting AI Anomaly Detection Backend on port {port}...")
+    print(f"📊 API available at: http://localhost:{port}/api")
+    print(f"🏥 Health check: http://localhost:{port}/api/health")
+    print(f"⚠️  Note: Redis service not required - using in-memory cache")
     socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True, use_reloader=False)

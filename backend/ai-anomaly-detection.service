@@ -1,0 +1,26 @@
+[Unit]
+Description=AI Anomaly Detection Backend - Gunicorn Service
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+RuntimeDirectory=gunicorn
+WorkingDirectory=/opt/ai-anomaly-detection/backend
+Environment="PATH=/opt/ai-anomaly-detection/backend/.venv/bin"
+ExecStart=/opt/ai-anomaly-detection/backend/.venv/bin/gunicorn \
+    --config /opt/ai-anomaly-detection/backend/gunicorn.conf.py \
+    --workers 4 \
+    --bind 127.0.0.1:5000 \
+    --worker-class eventlet \
+    wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+PrivateTmp=true
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

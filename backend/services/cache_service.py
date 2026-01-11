@@ -4,6 +4,7 @@ Redis cache service
 import redis
 from config import Config
 import json
+import socket
 
 class CacheService:
     """Redis cache service"""
@@ -13,18 +14,28 @@ class CacheService:
         self.connect()
     
     def connect(self):
-        """Connect to Redis"""
+        """Connect to Redis with fast timeout"""
         try:
+            # Set short timeout to avoid blocking on connection
             self.redis_client = redis.Redis(
                 host=Config.REDIS_HOST,
                 port=Config.REDIS_PORT,
                 db=Config.REDIS_DB,
-                decode_responses=True
+                decode_responses=True,
+                socket_connect_timeout=1,  # 1 second timeout
+                socket_timeout=1,
+                socket_keepalive=True,
+                health_check_interval=30
             )
+            # Quick ping with timeout
             self.redis_client.ping()
             print("✅ Connected to Redis")
-        except Exception as e:
+        except (redis.ConnectionError, redis.TimeoutError, socket.timeout, ConnectionRefusedError) as e:
             print(f"❌ Redis connection error: {e}")
+            print("ℹ️  Using in-memory cache fallback")
+            self.redis_client = None
+        except Exception as e:
+            print(f"❌ Redis error: {e}")
             self.redis_client = None
     
     def get(self, key):

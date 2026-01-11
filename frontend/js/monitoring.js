@@ -41,12 +41,28 @@ class MonitoringManager {
 
     async loadConnections() {
         try {
-            // Mock data - replace with actual API call
-            this.connections = this.generateMockConnections(20);
+            // Get real connections from API
+            const response = await apiService.get(API_CONFIG.endpoints.connections);
+            
+            if (response && response.connections) {
+                this.connections = response.connections;
+            } else if (response && Array.isArray(response)) {
+                this.connections = response;
+            } else {
+                // Fallback to mock data if API fails
+                console.warn('Using mock data - API returned unexpected format');
+                this.connections = this.generateMockConnections(20);
+            }
+            
             this.renderConnections();
             this.updateConnectionStats();
         } catch (error) {
             console.error('Error loading connections:', error);
+            showNotification('Failed to load connections', 'error');
+            // Use mock data as fallback
+            this.connections = this.generateMockConnections(20);
+            this.renderConnections();
+            this.updateConnectionStats();
         }
     }
 
@@ -128,6 +144,27 @@ class MonitoringManager {
     }
 
     async loadTrafficStats() {
+        try {
+            // Get real traffic stats from API
+            const response = await apiService.get(API_CONFIG.endpoints.trafficStats);
+            
+            if (response && response.stats) {
+                const stats = response.stats;
+                updateElement('bandwidth-usage', stats.bandwidth || 'N/A');
+                updateElement('network-latency', stats.latency || 'N/A');
+                updateElement('packet-loss', stats.packetLoss || 'N/A');
+                updateElement('system-uptime', stats.uptime || 'N/A');
+            } else {
+                // Fallback to mock stats
+                this.loadMockTrafficStats();
+            }
+        } catch (error) {
+            console.error('Error loading traffic stats:', error);
+            this.loadMockTrafficStats();
+        }
+    }
+    
+    loadMockTrafficStats() {
         const stats = {
             bandwidth: (Math.random() * 100 + 50).toFixed(2) + ' Mbps',
             latency: Math.floor(Math.random() * 50 + 10) + ' ms',

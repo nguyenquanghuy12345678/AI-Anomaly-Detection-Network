@@ -16,8 +16,8 @@ def init_websocket_handlers(socketio):
     @socketio.on('connect')
     def handle_connect():
         """Handle client connection"""
-        print(f"🔌 Client connected")
-        emit('connected', {'message': 'Connected to anomaly detection system'})
+        print(f"🔌 Client connected - WebSocket ready")
+        emit('connected', {'message': 'Connected to anomaly detection system', 'status': 'ready'})
     
     @socketio.on('disconnect')
     def handle_disconnect():
@@ -34,17 +34,20 @@ def init_websocket_handlers(socketio):
 def emit_anomaly(anomaly_data):
     """Emit new anomaly to all connected clients"""
     if socketio_instance:
-        socketio_instance.emit('anomaly', anomaly_data)
+        print(f"📡 Emitting anomaly_detected: {anomaly_data.get('id', 'unknown')}")
+        socketio_instance.emit('anomaly_detected', anomaly_data)
 
 def emit_traffic_update(traffic_data):
     """Emit traffic update to all connected clients"""
     if socketio_instance:
-        socketio_instance.emit('traffic', traffic_data)
+        print(f"📡 Emitting traffic_update")
+        socketio_instance.emit('traffic_update', traffic_data)
 
 def emit_alert(alert_data):
     """Emit new alert to all connected clients"""
     if socketio_instance:
-        socketio_instance.emit('alert', alert_data)
+        print(f"📡 Emitting alert_created: {alert_data.get('id', 'unknown')}")
+        socketio_instance.emit('alert_created', alert_data)
 
 def emit_status_update(status_data):
     """Emit system status update to all connected clients"""
