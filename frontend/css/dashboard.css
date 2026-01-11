@@ -1,0 +1,384 @@
+/* ========================================
+   Dashboard Layout
+   ======================================== */
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* ========================================
+   Metrics Grid
+   ======================================== */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.metric-info {
+    flex: 1;
+}
+
+.metric-info h3 {
+    font-size: 2rem;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.metric-info p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0 0 0.5rem 0;
+}
+
+.metric-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.metric-change.positive {
+    background: rgba(67, 233, 123, 0.1);
+    color: var(--success-color);
+}
+
+.metric-change.negative {
+    background: rgba(245, 87, 108, 0.1);
+    color: var(--danger-color);
+}
+
+/* ========================================
+   Table Styles
+   ======================================== */
+.table-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.table-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.table-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--light-bg);
+}
+
+.data-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.data-table tbody tr {
+    transition: var(--transition);
+}
+
+.data-table tbody tr:hover {
+    background: var(--light-bg);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.no-data {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem !important;
+}
+
+/* ========================================
+   Status Badges
+   ======================================== */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.critical {
+    background: rgba(245, 87, 108, 0.1);
+    color: var(--danger-color);
+}
+
+.badge.high {
+    background: rgba(254, 202, 87, 0.1);
+    color: var(--warning-color);
+}
+
+.badge.medium {
+    background: rgba(79, 172, 254, 0.1);
+    color: var(--info-color);
+}
+
+.badge.low {
+    background: rgba(67, 233, 123, 0.1);
+    color: var(--success-color);
+}
+
+.badge.active {
+    background: rgba(67, 233, 123, 0.1);
+    color: var(--success-color);
+}
+
+.badge.blocked {
+    background: rgba(245, 87, 108, 0.1);
+    color: var(--danger-color);
+}
+
+.badge.pending {
+    background: rgba(254, 202, 87, 0.1);
+    color: var(--warning-color);
+}
+
+/* ========================================
+   Action Buttons
+   ======================================== */
+.action-btn {
+    padding: 0.5rem;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    border-radius: 4px;
+}
+
+.action-btn:hover {
+    background: var(--border-color);
+    color: var(--primary-color);
+}
+
+.action-btn.danger:hover {
+    color: var(--danger-color);
+}
+
+.action-btn.success:hover {
+    color: var(--success-color);
+}
+
+/* ========================================
+   Table Footer
+   ======================================== */
+.table-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#pageInfo {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   Confidence Progress Bar
+   ======================================== */
+.confidence-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    transition: width 0.3s ease;
+}
+
+.confidence-value {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    min-width: 40px;
+}
+
+/* ========================================
+   IP Address Formatting
+   ======================================== */
+.ip-address {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* ========================================
+   Timestamp Formatting
+   ======================================== */
+.timestamp {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   Alert Styles
+   ======================================== */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert i {
+    font-size: 1.5rem;
+}
+
+.alert.info {
+    background: rgba(79, 172, 254, 0.1);
+    color: var(--info-color);
+}
+
+.alert.success {
+    background: rgba(67, 233, 123, 0.1);
+    color: var(--success-color);
+}
+
+.alert.warning {
+    background: rgba(254, 202, 87, 0.1);
+    color: var(--warning-color);
+}
+
+.alert.danger {
+    background: rgba(245, 87, 108, 0.1);
+    color: var(--danger-color);
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .metric-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .table-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .table-actions {
+        flex-direction: column;
+    }
+
+    .data-table {
+        font-size: 0.875rem;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}

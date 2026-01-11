@@ -1,0 +1,250 @@
+<div class="page-header">
+    <h2><i class="fas fa-bell"></i> Alerts & Notifications</h2>
+    <p>Monitor and manage security alerts in real-time</p>
+</div>
+
+<div class="page-content">
+    <!-- Alert Stats -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="total-alerts">0</h3>
+                <p>Total Alerts</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="unread-alerts">0</h3>
+                <p>Unread Alerts</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="critical-alerts">0</h3>
+                <p>Critical Alerts</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="action-required">0</h3>
+                <p>Action Required</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3>Alert Management</h3>
+            <div class="table-actions">
+                <select class="filter-select" id="severity-filter" onchange="alertsManager.filters.severity = this.value; alertsManager.applyFilters(); alertsManager.renderAlerts();">
+                    <option value="all">All Severities</option>
+                    <option value="critical">Critical</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                
+                <select class="filter-select" id="status-filter" onchange="alertsManager.filters.status = this.value; alertsManager.applyFilters(); alertsManager.renderAlerts();">
+                    <option value="all">All Status</option>
+                    <option value="unread">Unread</option>
+                    <option value="read">Read</option>
+                    <option value="dismissed">Dismissed</option>
+                </select>
+                
+                <select class="filter-select" id="date-filter" onchange="alertsManager.filters.dateRange = this.value; alertsManager.applyFilters(); alertsManager.renderAlerts();">
+                    <option value="all">All Time</option>
+                    <option value="1h">Last Hour</option>
+                    <option value="24h">Last 24 Hours</option>
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                </select>
+
+                <input type="text" class="search-input" placeholder="Search alerts..." id="alert-search" 
+                    onkeyup="clearTimeout(window.alertSearchTimeout); window.alertSearchTimeout = setTimeout(() => { alertsManager.filters.search = this.value; alertsManager.applyFilters(); alertsManager.renderAlerts(); }, 500);">
+
+                <button class="btn-primary" onclick="alertsManager.loadAlerts()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Alerts List -->
+        <div id="alerts-list" style="padding: 1rem;">
+            <div class="no-data" style="text-align: center; padding: 3rem;">
+                <p style="color: var(--text-secondary);">Loading alerts...</p>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="table-footer">
+            <div class="pagination">
+                <button class="btn-pagination" id="alerts-prev-page" onclick="alertsManager.goToPage(alertsManager.currentPage - 1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <span id="alerts-page-info">Page 1 of 1</span>
+                <button class="btn-pagination" id="alerts-next-page" onclick="alertsManager.goToPage(alertsManager.currentPage + 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.filter-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.alert-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+    position: relative;
+}
+
+.alert-item.unread {
+    background: rgba(102, 126, 234, 0.03);
+    border-left: 4px solid var(--primary-color);
+}
+
+.alert-item:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+}
+
+.alert-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 0.5rem;
+    flex-shrink: 0;
+}
+
+.alert-indicator.critical {
+    background: var(--danger-color);
+    animation: pulse 2s infinite;
+}
+
+.alert-indicator.high {
+    background: var(--warning-color);
+}
+
+.alert-indicator.medium {
+    background: var(--info-color);
+}
+
+.alert-indicator.low {
+    background: var(--success-color);
+}
+
+.alert-content {
+    flex: 1;
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.alert-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert-title h4 {
+    margin: 0;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+}
+
+.alert-description {
+    color: var(--text-secondary);
+    margin: 0 0 1rem 0;
+    line-height: 1.6;
+}
+
+.alert-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.alert-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-details i {
+    color: var(--primary-color);
+}
+
+.alert-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .alert-item {
+        flex-direction: column;
+    }
+
+    .alert-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .table-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-select, .search-input {
+        width: 100%;
+    }
+}
+</style>

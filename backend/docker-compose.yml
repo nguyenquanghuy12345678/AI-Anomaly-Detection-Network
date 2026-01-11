@@ -1,0 +1,154 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: anomaly_postgres
+    environment:
+      POSTGRES_DB: anomaly_detection
+      POSTGRES_USER: anomaly_user
+      POSTGRES_PASSWORD: anomaly_pass
+      POSTGRES_INITDB_ARGS: "-E UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U anomaly_user -d anomaly_detection"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - anomaly_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: anomaly_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - anomaly_network
+
+  # Zabbix Database
+  zabbix_postgres:
+    image: postgres:16-alpine
+    container_name: zabbix_postgres
+    environment:
+      POSTGRES_DB: zabbix
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+    volumes:
+      - zabbix_postgres_data:/var/lib/postgresql/data
+    networks:
+      - anomaly_network
+
+  # Zabbix Server
+  zabbix_server:
+    image: zabbix/zabbix-server-pgsql:alpine-7.0-latest
+    container_name: zabbix_server
+    environment:
+      DB_SERVER_HOST: zabbix_postgres
+      POSTGRES_DB: zabbix
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      ZBX_ENABLE_SNMP_TRAPS: "true"
+      ZBX_STARTPOLLERS: 5
+      ZBX_STARTPOLLERSUNREACHABLE: 1
+      ZBX_STARTTRAPPERS: 5
+      ZBX_STARTPINGERS: 1
+      ZBX_STARTDISCOVERERS: 1
+      ZBX_STARTHTTPPOLLERS: 1
+    ports:
+      - "10051:10051"
+    volumes:
+      - zabbix_alertscripts:/usr/lib/zabbix/alertscripts
+      - zabbix_externalscripts:/usr/lib/zabbix/externalscripts
+      - zabbix_modules:/var/lib/zabbix/modules
+    depends_on:
+      - zabbix_postgres
+    networks:
+      - anomaly_network
+
+  # Zabbix Web Interface
+  zabbix_web:
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest
+    container_name: zabbix_web
+    environment:
+      DB_SERVER_HOST: zabbix_postgres
+      POSTGRES_DB: zabbix
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      ZBX_SERVER_HOST: zabbix_server
+      PHP_TZ: Asia/Ho_Chi_Minh
+    ports:
+      - "8080:8080"
+    depends_on:
+      - zabbix_postgres
+      - zabbix_server
+    networks:
+      - anomaly_network
+
+  # Zabbix Agent
+  zabbix_agent:
+    image: zabbix/zabbix-agent:alpine-7.0-latest
+    container_name: zabbix_agent
+    environment:
+      ZBX_HOSTNAME: "Zabbix server"
+      ZBX_SERVER_HOST: zabbix_server
+    ports:
+      - "10050:10050"
+    depends_on:
+      - zabbix_server
+    networks:
+      - anomaly_network
+
+  # Backend API (Flask)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anomaly_backend
+    environment:
+      FLASK_ENV: development
+      DATABASE_URL: postgresql://anomaly_user:anomaly_pass@postgres:5432/anomaly_detection
+      REDIS_URL: redis://redis:6379/0
+      ZABBIX_API_URL: http://zabbix_web:8080/api_jsonrpc.php
+      ZABBIX_USER: Admin
+      ZABBIX_PASSWORD: zabbix
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app
+      - ./logs:/app/logs
+      - ./models:/app/models
+      - ./data:/app/data
+    depends_on:
+      - postgres
+      - redis
+      - zabbix_server
+    networks:
+      - anomaly_network
+    command: python app.py
+
+volumes:
+  postgres_data:
+  redis_data:
+  zabbix_postgres_data:
+  zabbix_alertscripts:
+  zabbix_externalscripts:
+  zabbix_modules:
+
+networks:
+  anomaly_network:
+    driver: bridge

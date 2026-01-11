@@ -1,0 +1,330 @@
+<div class="page-header">
+    <h2><i class="fas fa-chart-line"></i> Analytics & Reports</h2>
+    <p>Advanced analytics and historical threat analysis</p>
+</div>
+
+<div class="page-content">
+    <!-- Date Range Selector -->
+    <div class="date-range-selector">
+        <button class="date-range-btn active" data-range="7d">Last 7 Days</button>
+        <button class="date-range-btn" data-range="30d">Last 30 Days</button>
+        <button class="date-range-btn" data-range="90d">Last 90 Days</button>
+        <button class="date-range-btn" data-range="1y">Last Year</button>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="total-anomalies-analytics">0</h3>
+                <p>Total Anomalies</p>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 8.2%
+                </span>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="total-blocked-analytics">0</h3>
+                <p>Threats Blocked</p>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 12.5%
+                </span>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="avg-response-analytics">0 min</h3>
+                <p>Avg Response Time</p>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-down"></i> 5.3%
+                </span>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fas fa-crosshairs"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="detection-accuracy">0%</h3>
+                <p>Detection Accuracy</p>
+                <span class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> 0.5%
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Analytics Charts -->
+    <div class="charts-grid">
+        <div class="chart-card" style="grid-column: 1 / -1;">
+            <div class="chart-header">
+                <h3>Threat Trends Over Time</h3>
+                <div class="chart-actions">
+                    <button class="btn-icon" onclick="analyticsManager.loadTrendData()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="trend-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Severity Distribution</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="severity-trend-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Response Time Analysis</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="response-time-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- Top Threats -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Top Threat Types</h3>
+            </div>
+            <div id="top-threats-list" style="padding: 1rem;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Geographic Distribution -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Attack Origins</h3>
+            </div>
+            <div id="geographic-list" style="padding: 1rem;">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Model Performance -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>AI Model Performance</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="model-performance-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="table-card">
+            <div class="table-header">
+                <h3>Model Statistics</h3>
+            </div>
+            <div style="padding: 1.5rem;">
+                <div class="stat-row">
+                    <span>False Positives:</span>
+                    <strong id="false-positives">0%</strong>
+                </div>
+                <div class="stat-row">
+                    <span>Critical Incidents:</span>
+                    <strong id="critical-incidents">0</strong>
+                </div>
+                <div class="stat-row">
+                    <span>High Priority:</span>
+                    <strong id="high-incidents">0</strong>
+                </div>
+                <div class="stat-row">
+                    <span>Medium Priority:</span>
+                    <strong id="medium-incidents">0</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Reports -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3>Export Reports</h3>
+        </div>
+        <div style="padding: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button class="btn-primary" onclick="analyticsManager.exportReport('pdf')">
+                <i class="fas fa-file-pdf"></i> Export as PDF
+            </button>
+            <button class="btn-primary" onclick="analyticsManager.exportReport('excel')">
+                <i class="fas fa-file-excel"></i> Export as Excel
+            </button>
+            <button class="btn-primary" onclick="analyticsManager.exportReport('csv')">
+                <i class="fas fa-file-csv"></i> Export as CSV
+            </button>
+            <button class="btn-secondary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print Report
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.date-range-selector {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.date-range-btn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.date-range-btn:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.date-range-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.threat-item, .geo-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.threat-item:last-child, .geo-item:last-child {
+    border-bottom: none;
+}
+
+.threat-rank {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.threat-info, .geo-info {
+    flex: 1;
+}
+
+.threat-name, .geo-country {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.threat-count, .geo-count {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.threat-trend {
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.threat-trend.up {
+    color: var(--danger-color);
+}
+
+.threat-trend.down {
+    color: var(--success-color);
+}
+
+.geo-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.geo-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.geo-percentage {
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 50px;
+    text-align: right;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row span {
+    color: var(--text-secondary);
+}
+
+.stat-row strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .date-range-selector {
+        flex-wrap: wrap;
+    }
+
+    .date-range-btn {
+        flex: 1 1 calc(50% - 0.25rem);
+    }
+
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>

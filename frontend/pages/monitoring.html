@@ -1,0 +1,218 @@
+<div class="page-header">
+    <h2><i class="fas fa-eye"></i> Network Monitoring</h2>
+    <p>Real-time network traffic and connection monitoring</p>
+</div>
+
+<div class="page-content">
+    <!-- Stats Overview -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-plug"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="active-connections-stat">0</h3>
+                <p>Active Connections</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fas fa-network-wired"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="bandwidth-usage">0 Mbps</h3>
+                <p>Bandwidth Usage</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="network-latency">0 ms</h3>
+                <p>Network Latency</p>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="metric-info">
+                <h3 id="packet-loss">0%</h3>
+                <p>Packet Loss</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Bandwidth Usage</h3>
+                <div class="realtime-indicator">
+                    <span class="realtime-dot"></span>
+                    <span>Live</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="bandwidth-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Protocol Distribution</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="protocol-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card" style="grid-column: 1 / -1;">
+            <div class="chart-header">
+                <h3>Network Latency</h3>
+                <div class="realtime-indicator">
+                    <span class="realtime-dot"></span>
+                    <span>Live</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="latency-chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Connections Table -->
+    <div class="table-card">
+        <div class="table-header">
+            <h3>Active Connections</h3>
+            <div class="table-actions">
+                <button class="btn-primary" onclick="monitoringManager.loadConnections()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Protocol</th>
+                        <th>State</th>
+                        <th>Bytes</th>
+                        <th>Packets</th>
+                        <th>Duration</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="connections-tbody">
+                    <tr>
+                        <td colspan="9" class="no-data">Loading connections...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Network Info -->
+    <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="fas fa-door-open"></i>
+            </div>
+            <div class="info-content">
+                <h4 id="listening-ports">0</h4>
+                <p>Listening Ports</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="info-content">
+                <h4 id="total-bytes">0 B</h4>
+                <p>Total Data</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="info-content">
+                <h4 id="total-packets">0</h4>
+                <p>Total Packets</p>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="info-content">
+                <h4 id="system-uptime">0%</h4>
+                <p>System Uptime</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.info-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.info-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.info-content h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.info-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.badge.tcp { background: rgba(102, 126, 234, 0.1); color: var(--primary-color); }
+.badge.udp { background: rgba(79, 172, 254, 0.1); color: var(--info-color); }
+.badge.http { background: rgba(67, 233, 123, 0.1); color: var(--success-color); }
+.badge.https { background: rgba(67, 233, 123, 0.1); color: var(--success-color); }
+.badge.ssh { background: rgba(254, 202, 87, 0.1); color: var(--warning-color); }
+.badge.ftp { background: rgba(245, 87, 108, 0.1); color: var(--danger-color); }
+
+.badge.established { background: rgba(67, 233, 123, 0.1); color: var(--success-color); }
+.badge.listening { background: rgba(79, 172, 254, 0.1); color: var(--info-color); }
+.badge.time-wait { background: rgba(254, 202, 87, 0.1); color: var(--warning-color); }
+.badge.close-wait { background: rgba(245, 87, 108, 0.1); color: var(--danger-color); }
+</style>

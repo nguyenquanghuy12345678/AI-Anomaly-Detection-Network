@@ -1,0 +1,18 @@
+{
+  "features": [
+    "source_port",
+    "dest_port",
+    "protocol",
+    "packet_size",
+    "packets",
+    "bytes",
+    "duration",
+    "flag_count",
+    "syn_flag",
+    "ack_flag",
+    "rst_flag",
+    "connection_rate",
+    "hour",
+    "day_of_week"
+  ]
+}

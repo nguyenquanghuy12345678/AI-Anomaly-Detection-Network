@@ -1,0 +1,19 @@
+{
+  "features": [
+    "hour",
+    "day_of_week",
+    "day_of_month",
+    "is_weekend",
+    "is_business_hours",
+    "traffic_mbps",
+    "connections_count",
+    "packets_per_sec",
+    "avg_packet_size",
+    "tcp_ratio",
+    "udp_ratio",
+    "http_ratio",
+    "traffic_lag_1",
+    "traffic_lag_2",
+    "traffic_lag_3"
+  ]
+}

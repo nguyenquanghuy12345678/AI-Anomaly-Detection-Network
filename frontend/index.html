@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="AI-powered Network Anomaly Detection System for real-time security monitoring">
+    <title>AI Network Anomaly Detection System</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/dark-theme.css">
+    <link rel="stylesheet" href="css/enhancements.css">
+    <link rel="stylesheet" href="css/polish.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet for maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Leaflet for maps -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>AI Network Anomaly Detection</h1>
+            </div>
+            <nav class="nav">
+                <a href="#dashboard" class="nav-link active">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#monitoring" class="nav-link">
+                    <i class="fas fa-eye"></i> Monitoring
+                </a>
+                <a href="#alerts" class="nav-link">
+                    <i class="fas fa-bell"></i> Alerts
+                </a>
+                <a href="#analytics" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </a>
+                <a href="#map" class="nav-link">
+                    <i class="fas fa-globe"></i> Map
+                </a>
+                <a href="#settings" class="nav-link">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn-icon" id="themeToggle" title="Toggle Dark Mode" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-icon" id="notificationsBtn" title="Notifications" aria-label="View notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </button>
+                <div class="user-profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content" role="main">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3>System Status</h3>
+                <div class="status-item">
+                    <div class="status-indicator active"></div>
+                    <div class="status-info">
+                        <p class="status-label">AI Model</p>
+                        <p class="status-value" id="aiModelStatus">Active</p>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator active"></div>
+                    <div class="status-info">
+                        <p class="status-label">Network Monitor</p>
+                        <p class="status-value" id="networkMonitorStatus">Running</p>
+                    </div>
+                </div>
+                <div class="status-item">
+                    <div class="status-indicator active"></div>
+                    <div class="status-info">
+                        <p class="status-label">Database</p>
+                        <p class="status-value" id="databaseStatus">Connected</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Quick Stats</h3>
+                <div class="quick-stat">
+                    <i class="fas fa-network-wired"></i>
+                    <div>
+                        <p class="stat-value" id="activeConnections">0</p>
+                        <p class="stat-label">Active Connections</p>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <p class="stat-value" id="totalAnomalies">0</p>
+                        <p class="stat-label">Total Anomalies</p>
+                    </div>
+                </div>
+                <div class="quick-stat">
+                    <i class="fas fa-chart-bar"></i>
+                    <div>
+                        <p class="stat-value" id="detectionRate">0%</p>
+                        <p class="stat-label">Detection Rate</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Dashboard Content -->
+        <section class="dashboard">
+            <!-- Metrics Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="totalTraffic">0</h3>
+                        <p>Total Traffic (MB)</p>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 12.5%
+                        </span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="anomalyCount">0</h3>
+                        <p>Anomalies Detected</p>
+                        <span class="metric-change negative">
+                            <i class="fas fa-arrow-down"></i> 3.2%
+                        </span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="blockedThreats">0</h3>
+                        <p>Blocked Threats</p>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 8.1%
+                        </span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="metric-info">
+                        <h3 id="avgResponseTime">0ms</h3>
+                        <p>Avg Response Time</p>
+                        <span class="metric-change positive">
+                            <i class="fas fa-arrow-up"></i> 5.7%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <!-- Real-time Traffic Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Real-time Network Traffic</h3>
+                        <div class="chart-actions">
+                            <button class="btn-icon" onclick="refreshTrafficChart()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trafficChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Anomaly Detection Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Anomaly Detection Over Time</h3>
+                        <div class="chart-actions">
+                            <button class="btn-icon" onclick="refreshAnomalyChart()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="anomalyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threat Distribution and AI Confidence -->
+            <div class="charts-grid">
+                <!-- Threat Type Distribution -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Threat Type Distribution</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="threatDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI Model Confidence -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>AI Model Confidence</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="confidenceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Anomalies Table -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h3>Recent Anomalies</h3>
+                    <div class="table-actions">
+                        <input type="text" class="search-input" placeholder="Search anomalies..." id="searchInput">
+                        <button class="btn-primary" onclick="exportAnomalies()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Source IP</th>
+                                <th>Destination IP</th>
+                                <th>Type</th>
+                                <th>Severity</th>
+                                <th>Confidence</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="anomaliesTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                            <tr>
+                                <td colspan="8" class="no-data">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-footer">
+                    <div class="pagination">
+                        <button class="btn-pagination" id="prevPage">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button class="btn-pagination" id="nextPage">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Alert Modal -->
+    <div class="modal" id="alertModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Anomaly Details</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Details will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-primary" onclick="blockThreat()">Block Threat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/monitoring.js"></script>
+    <script src="js/alerts.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+/* ========================================
+   Dark Theme Styles
+   ======================================== */
+
+body.dark-theme,
+[data-theme="dark"] {
+    --dark-bg: #1a1a2e;
+    --darker-bg: #16213e;
+    --light-bg: #0f1419;
+    --card-bg: #1e2738;
+    --text-primary: #e4e6eb;
+    --text-secondary: #b0b3b8;
+    --text-light: #8a8d91;
+    --border-color: #3a3b3c;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+}
+
+body.dark-theme {
+    background-color: var(--dark-bg);
+    color: var(--text-primary);
+}
+
+body.dark-theme .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-theme .card-bg,
+body.dark-theme .table-card,
+body.dark-theme .metric-card,
+body.dark-theme .chart-card,
+body.dark-theme .sidebar-section,
+body.dark-theme .page-header,
+body.dark-theme .alert-item {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+body.dark-theme .data-table thead {
+    background: var(--darker-bg);
+}
+
+body.dark-theme .data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .btn-secondary {
+    background: var(--darker-bg);
+    color: var(--text-primary);
+}
+
+body.dark-theme .btn-secondary:hover {
+    background: var(--border-color);
+}
+
+body.dark-theme .search-input,
+body.dark-theme .setting-input,
+body.dark-theme .filter-select {
+    background: var(--darker-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+body.dark-theme .modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-theme .loading-overlay {
+    background: rgba(26, 26, 46, 0.9);
+}
+
+body.dark-theme .alert.info {
+    background: rgba(79, 172, 254, 0.2);
+}
+
+body.dark-theme .alert.success {
+    background: rgba(67, 233, 123, 0.2);
+}
+
+body.dark-theme .alert.warning {
+    background: rgba(254, 202, 87, 0.2);
+}
+
+body.dark-theme .alert.danger {
+    background: rgba(245, 87, 108, 0.2);
+}
+
+body.dark-theme .settings-tab {
+    background: var(--card-bg);
+}
+
+body.dark-theme .settings-tab:hover {
+    background: var(--darker-bg);
+}
+
+body.dark-theme .toggle-slider {
+    background-color: var(--darker-bg);
+}
+
+body.dark-theme .info-card {
+    background: var(--card-bg);
+}
+
+/* Chart dark theme adjustments */
+body.dark-theme canvas {
+    filter: brightness(1.1);
+}
+
+/* Smooth theme transition */
+body,
+.header,
+.card-bg,
+.table-card,
+.metric-card,
+.chart-card,
+.sidebar-section,
+.nav-link {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}

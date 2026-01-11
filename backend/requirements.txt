@@ -1,0 +1,52 @@
+# Core Framework
+flask==3.0.0
+flask-cors==4.0.0
+flask-socketio==5.3.5
+python-socketio==5.10.0
+
+# Database
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.23
+alembic==1.13.1
+
+# Redis & Caching
+redis==5.0.1
+hiredis==2.3.2
+
+# AI/ML Libraries
+scikit-learn==1.3.2
+numpy==1.26.2
+pandas==2.1.4
+scipy==1.11.4
+joblib==1.3.2
+
+# Network Monitoring
+scapy==2.5.0
+pyshark==0.6
+
+# Zabbix Integration
+pyzabbix==1.3.0
+
+# Geolocation
+geoip2==4.7.0
+maxminddb==2.5.0
+
+# Data Processing
+python-dateutil==2.8.2
+pytz==2023.3
+
+# API & Validation
+marshmallow==3.20.1
+pydantic==2.5.3
+
+# Utilities
+python-dotenv==1.0.0
+click==8.1.7
+
+# Monitoring & Logging
+prometheus-client==0.19.0
+psutil==5.9.6
+
+# Testing
+pytest==7.4.3
+pytest-cov==4.1.0
