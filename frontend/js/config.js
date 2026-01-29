@@ -13,19 +13,35 @@ const API_CONFIG = {
         // Network monitoring endpoints (Updated to match backend)
         networkTraffic: '/traffic',
         networkStats: '/traffic/stats',
+        trafficRecent: '/traffic/recent',
+        
+        // Connection endpoints
+        connections: '/connections',
+        connectionsStats: '/connections/stats',
+        
+        // Real Network endpoints
+        realInterfaces: '/real-network/interfaces',
+        realConnections: '/real-network/connections',
+        realStats: '/real-network/stats',
+        realCaptureStart: '/real-network/capture/start',
+        realCaptureStop: '/real-network/capture/stop',
+        realCaptureStats: '/real-network/capture/stats',
         
         // AI Model endpoints
         modelStatus: '/model/status',
         modelMetrics: '/model/metrics',
         modelPredict: '/model/predict',
+        modelRetrain: '/model/retrain',
         
         // System endpoints
         systemStatus: '/system/status',
         systemHealth: '/system/health',
+        systemMetrics: '/system/metrics',
         
         // Alert endpoints
         alerts: '/alerts',
         alertsUnread: '/alerts/unread',
+        alertsStats: '/alerts/stats',
     },
     
     // WebSocket configuration (Socket.IO)

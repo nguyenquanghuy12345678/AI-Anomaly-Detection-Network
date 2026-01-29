@@ -16,6 +16,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Disable strict slashes to avoid 308 redirects
+app.url_map.strict_slashes = False
+
 # Initialize CORS
 CORS(app, resources={
     r"/api/*": {
@@ -25,8 +28,14 @@ CORS(app, resources={
     }
 })
 
-# Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# Initialize SocketIO with eventlet
+socketio = SocketIO(
+    app, 
+    cors_allowed_origins="*", 
+    async_mode='eventlet',  # Use eventlet for better WebSocket support
+    logger=False,
+    engineio_logger=False
+)
 
 # Import after app initialization to avoid circular imports
 from api import register_blueprints
@@ -75,5 +84,15 @@ if __name__ == '__main__':
     print(f"🚀 Starting AI Anomaly Detection Backend on port {port}...")
     print(f"📊 API available at: http://localhost:{port}/api")
     print(f"🏥 Health check: http://localhost:{port}/api/health")
+    print(f"🔌 WebSocket: http://localhost:{port}/socket.io")
     print(f"⚠️  Note: Redis service not required - using in-memory cache")
-    socketio.run(app, host='0.0.0.0', port=port, debug=False, allow_unsafe_werkzeug=True, use_reloader=False)
+    
+    # Use eventlet or gevent for better WebSocket support
+    socketio.run(
+        app, 
+        host='0.0.0.0', 
+        port=port, 
+        debug=False, 
+        use_reloader=False,
+        log_output=True
+    )

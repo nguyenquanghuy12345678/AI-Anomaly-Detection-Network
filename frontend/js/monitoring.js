@@ -146,7 +146,7 @@ class MonitoringManager {
     async loadTrafficStats() {
         try {
             // Get real traffic stats from API
-            const response = await apiService.get(API_CONFIG.endpoints.trafficStats);
+            const response = await apiService.get(API_CONFIG.endpoints.networkStats);
             
             if (response && response.stats) {
                 const stats = response.stats;

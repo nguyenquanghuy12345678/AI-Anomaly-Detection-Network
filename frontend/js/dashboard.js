@@ -138,13 +138,7 @@ class DashboardManager {
     async loadAnomaliesTable() {
         try {
             // Try to get real anomalies from API
-            const response = await apiService.getAnomalies({
-                page: this.currentPage,
-                pageSize: this.pageSize,
-                severity: this.filters.severity !== 'all' ? this.filters.severity : undefined,
-                status: this.filters.status !== 'all' ? this.filters.status : undefined,
-                search: this.filters.search || undefined
-            });
+            const response = await apiService.getAnomalies(this.currentPage, this.pageSize);
             
             if (response && response.anomalies) {
                 this.anomalies = response.anomalies;

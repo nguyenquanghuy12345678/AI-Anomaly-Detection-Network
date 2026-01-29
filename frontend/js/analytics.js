@@ -120,8 +120,8 @@ class AnalyticsManager {
 
     async loadTopThreats() {
         try {
-            // Try to get real top threats from API
-            const response = await apiService.get(API_CONFIG.endpoints.anomalies.base + '/top-threats');
+            // Try to get real top threats from API - use anomaly stats
+            const response = await apiService.getAnomalyStats();
             
             if (response && response.threats) {
                 this.reportData.topThreats = response.threats;
@@ -149,15 +149,8 @@ class AnalyticsManager {
 
     async loadGeographicData() {
         try {
-            // Try to get real geographic data from API
-            const response = await apiService.get(API_CONFIG.endpoints.anomalies.base + '/geographic');
-            
-            if (response && response.geographic) {
-                this.reportData.geographic = response.geographic;
-            } else {
-                // Fallback to mock data
-                this.loadMockGeographicData();
-            }
+            // Use mock data for geographic visualization
+            this.loadMockGeographicData();
         } catch (error) {
             console.error('Error loading geographic data:', error);
             this.loadMockGeographicData();

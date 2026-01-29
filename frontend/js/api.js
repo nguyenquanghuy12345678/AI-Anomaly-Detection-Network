@@ -103,23 +103,49 @@ class APIService {
     // ========================================
 
     async getNetworkTraffic(timeRange = '1h') {
-        return this.get(this.endpoints.traffic, { timeRange });
+        return this.get(this.endpoints.networkTraffic, { timeRange });
     }
 
     async getNetworkStats() {
-        return this.get(this.endpoints.trafficStats);
+        return this.get(this.endpoints.networkStats);
     }
     
+    async getRecentTraffic(limit = 10) {
+        return this.get(this.endpoints.trafficRecent, { limit });
+    }
+    
+    // Connection API methods
     async getConnections() {
         return this.get(this.endpoints.connections);
     }
     
     async getConnectionStats() {
-        return this.get(this.endpoints.connectionStats);
+        return this.get(this.endpoints.connectionsStats);
     }
     
-    async getTrafficStats() {
-        return this.get(this.endpoints.trafficStats);
+    // Real Network API methods
+    async getRealInterfaces() {
+        return this.get(this.endpoints.realInterfaces);
+    }
+    
+    async getRealConnections() {
+        return this.get(this.endpoints.realConnections);
+    }
+    
+    async getRealStats() {
+        return this.get(this.endpoints.realStats);
+    }
+    
+    async startRealCapture(data = {}) {
+        return this.post(this.endpoints.realCaptureStart, data);
+    }
+    
+    async stopRealCapture() {
+        return this.post(this.endpoints.realCaptureStop);
+    }
+    
+    async getRealCaptureStats() {
+        return this.get(this.endpoints.realCaptureStats);
     }
 
     // ========================================
@@ -137,6 +163,10 @@ class APIService {
     async predictAnomaly(data) {
         return this.post(this.endpoints.modelPredict, data);
     }
+    
+    async retrainModel() {
+        return this.post(this.endpoints.modelRetrain);
+    }
 
     // ========================================
     // System API Methods
@@ -149,6 +179,10 @@ class APIService {
     async getSystemHealth() {
         return this.get(this.endpoints.systemHealth);
     }
+    
+    async getSystemMetrics() {
+        return this.get(this.endpoints.systemMetrics);
+    }
 
     // ========================================
     // Alert API Methods
@@ -158,6 +192,10 @@ class APIService {
         const endpoint = unreadOnly ? this.endpoints.alertsUnread : this.endpoints.alerts;
         return this.get(endpoint);
     }
+    
+    async getAlertStats() {
+        return this.get(this.endpoints.alertsStats);
+    }
 
     async markAlertAsRead(id) {
         return this.put(`${this.endpoints.alerts}/${id}/read`);
@@ -165,6 +203,10 @@ class APIService {
 
     async deleteAlert(id) {
         return this.delete(`${this.endpoints.alerts}/${id}`);
+    }
+    
+    async createAlert(data) {
+        return this.post(this.endpoints.alerts, data);
     }
 
     // ========================================
@@ -219,12 +261,12 @@ class APIService {
 }
 
 // ========================================
-// WebSocket Service
+// WebSocket Service (Socket.IO)
 // ========================================
 
 class WebSocketService {
     constructor() {
-        this.ws = null;
+        this.socket = null;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = API_CONFIG.websocket.maxReconnectAttempts;
         this.reconnectInterval = API_CONFIG.websocket.reconnectInterval;
@@ -234,54 +276,73 @@ class WebSocketService {
 
     connect() {
         try {
-            this.ws = new WebSocket(API_CONFIG.websocket.url);
+            // Socket.IO connection
+            this.socket = io(API_CONFIG.websocket.url, {
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: this.maxReconnectAttempts,
+                reconnectionDelay: this.reconnectInterval
+            });
             
-            this.ws.onopen = () => {
+            this.socket.on('connect', () => {
                 this.isConnected = true;
                 this.reconnectAttempts = 0;
-                console.log('WebSocket connected');
+                console.log('✅ Socket.IO connected');
                 showNotification('Real-time monitoring active', 'success');
                 this.emit('connected');
-            };
+            });
 
-            this.ws.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    this.handleMessage(data);
-                } catch (error) {
-                    console.error('WebSocket message parse error:', error);
-                }
-            };
+            // Listen for anomaly events
+            this.socket.on('anomaly', (data) => {
+                console.log('📊 New anomaly received:', data);
+                this.emit('anomaly', data);
+            });
+            
+            // Listen for traffic updates
+            this.socket.on('traffic_update', (data) => {
+                console.log('📈 Traffic update received');
+                this.emit('traffic', data);
+            });
+            
+            // Listen for alert events
+            this.socket.on('alert', (data) => {
+                console.log('⚠️ New alert received:', data);
+                this.emit('alert', data);
+            });
 
-            this.ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-                this.emit('error', error);
-            };
-
-            this.ws.onclose = () => {
+            this.socket.on('disconnect', (reason) => {
                 this.isConnected = false;
-                console.log('WebSocket disconnected');
-                this.attemptReconnect();
-            };
+                console.log('❌ Socket.IO disconnected:', reason);
+                if (reason === 'io server disconnect') {
+                    // Server disconnected, reconnect manually
+                    this.socket.connect();
+                }
+                this.emit('disconnected', reason);
+            });
+            
+            this.socket.on('connect_error', (error) => {
+                console.error('❌ Socket.IO connection error:', error);
+                this.emit('error', error);
+            });
+            
+            this.socket.on('reconnect', (attemptNumber) => {
+                console.log(`🔄 Reconnected after ${attemptNumber} attempts`);
+                showNotification('Reconnected to server', 'success');
+            });
+            
+            this.socket.on('reconnect_attempt', (attemptNumber) => {
+                console.log(`🔄 Reconnecting... Attempt ${attemptNumber}`);
+            });
+            
+            this.socket.on('reconnect_failed', () => {
+                console.error('❌ Failed to reconnect');
+                showNotification('Unable to establish real-time connection', 'error');
+            });
+            
         } catch (error) {
             console.error('WebSocket connection error:', error);
-            this.attemptReconnect();
+            this.emit('error', error);
         }
-    }
-
-    attemptReconnect() {
-        if (this.reconnectAttempts < this.maxReconnectAttempts) {
-            this.reconnectAttempts++;
-            console.log(`Reconnecting... Attempt ${this.reconnectAttempts}`);
-            setTimeout(() => this.connect(), this.reconnectInterval);
-        } else {
-            showNotification('Unable to establish real-time connection', 'error');
-        }
-    }
-
-    handleMessage(data) {
-        const { type, payload } = data;
-        this.emit(type, payload);
     }
 
     on(event, callback) {
@@ -298,22 +359,29 @@ class WebSocketService {
 
     emit(event, data) {
         if (!this.listeners[event]) return;
-        this.listeners[event].forEach(callback => callback(data));
+        this.listeners[event].forEach(callback => {
+            try {
+                callback(data);
+            } catch (error) {
+                console.error(`Error in event listener for ${event}:`, error);
+            }
+        });
     }
 
-    send(type, payload) {
-        if (this.isConnected && this.ws) {
-            this.ws.send(JSON.stringify({ type, payload }));
+    send(event, data) {
+        if (this.isConnected && this.socket) {
+            this.socket.emit(event, data);
         } else {
-            console.warn('WebSocket not connected');
+            console.warn('Socket.IO not connected');
         }
     }
 
     disconnect() {
-        if (this.ws) {
-            this.ws.close();
-            this.ws = null;
+        if (this.socket) {
+            this.socket.disconnect();
+            this.socket = null;
             this.isConnected = false;
+            console.log('🔌 Socket.IO disconnected manually');
         }
     }
 }

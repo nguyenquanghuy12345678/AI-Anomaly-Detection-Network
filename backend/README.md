@@ -2,6 +2,22 @@
 
 Backend API server cho hệ thống phát hiện anomaly mạng với tích hợp Zabbix, PostgreSQL, Redis, và AI/ML.
 
+## 🆕 NEW: Real Network Data Collection
+
+**Hệ thống giờ hỗ trợ 2 chế độ:**
+- 🎭 **Mock Data** (Default) - Dữ liệu giả lập cho demo
+- 🔴 **Real Data** (NEW!) - Thu thập dữ liệu THẬT từ network
+
+```bash
+# Test real data
+python test_real_network.py
+
+# Switch mode
+python switch_data_mode.py
+```
+
+📖 **Xem chi tiết:** [DATA_SOURCE_EXPLAINED.md](DATA_SOURCE_EXPLAINED.md)
+
 ## 🏗️ Kiến trúc
 
 ```

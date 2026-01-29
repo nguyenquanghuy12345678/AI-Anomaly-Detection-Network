@@ -34,20 +34,19 @@ venv.bak/
 .venv/
 
 # Flask
-instance/
+instance/*.db
+instance/*.sqlite
+instance/*.sqlite3
 .webassets-cache
-*.db
-*.sqlite
-*.sqlite3
+# Keep instance directory structure but ignore DB files
 
-# ML Models (uncomment if models are large)
-# backend/models/*.pkl
+# ML Models - KEEP these for deployment
+# backend/models/*.pkl  # Uncomment if you want to exclude large models
 # backend/models/*.h5
 # backend/models/*.joblib
 
-# Datasets (uncomment if datasets are large)
-# backend/datasets/*.csv
-# backend/datasets/*.json
+# Datasets - KEEP sample datasets for deployment
+# backend/data/datasets/*.csv  # Uncomment if datasets are too large
 
 # Logs
 *.log
@@ -208,11 +207,18 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Local test files
-test_*.py
-*_test.py
+# Local test files (Development only)
+check_system.py
+test_integration.py
+test_real_network.py
+switch_data_mode.py
 test_*.html
 test_*.json
+
+# Windows-specific files
+*.bat
+*.ps1
+*.cmd
 
 # Local configuration overrides
 local_settings.py
